@@ -1,0 +1,251 @@
+message GetBuildHistoriesRequest {
+  int32 page_size = 1 [
+    (buf.validate.field).int32.gte = 0,
+    (buf.validate.field).int32.lte = 10
+  ];
+  string page_token = 2;
+}
+
+message GetBuildHistoriesResponse {
+  repeated BuildHistory build_histories = 1;
+  string next_page_token = 2;
+
+  message BuildHistory {
+    int64 service_no = 1;
+    string service_name = 2;
+    string repository_url = 3;
+    string commit_hash = 4;
+    string commit_message = 6;
+    BuildStatus build_status = 7;
+    string log = 8;
+    google.protobuf.Timestamp timestamp = 9;
+  }
+}
+
+message GetDeploymentsRequest {}
+
+message GetDeploymentsResponse {
+  repeated Deployment deployments = 1;
+
+  message Deployment {
+    int64 service_no = 1;
+    string service_name = 2;
+    string repository_url = 3;
+    string commit_hash = 4;
+    string commit_message = 5;
+    google.protobuf.Timestamp deployed_at = 6;
+    int64 tick_index = 7;
+    google.protobuf.Timestamp tick_open_at = 8;
+    google.protobuf.Timestamp tick_close_at = 9;
+    ServiceStatus service_status = 10;
+    LastTickInfo last_tick_info = 11;
+    bool is_staging = 12;
+
+    message LastTickInfo {
+      int64 tick_index = 1;
+      google.protobuf.Timestamp tick_open_at = 2;
+      google.protobuf.Timestamp tick_close_at = 3;
+      ServiceStatus service_status = 4;
+      SLAStatus sla_status = 5;
+      string sla_message = 6;
+    }
+  }
+}
+
+message GetSLAHistoriesRequest {
+  int32 page_size = 1 [
+    (buf.validate.field).int32.gte = 0,
+    (buf.validate.field).int32.lte = 10
+  ];
+  string page_token = 2;
+}
+
+message GetSLAHistoriesResponse {
+  repeated SLAHistory sla_histories = 1;
+  string next_page_token = 2;
+
+  message SLAHistory {
+    int64 service_no = 1;
+    string service_name = 2;
+    int64 tick_index = 3;
+    google.protobuf.Timestamp tick_open_at = 4;
+    google.protobuf.Timestamp tick_close_at = 5;
+    string commit_hash = 6;
+    string commit_message = 7;
+    SLAStatus sla_status = 8;
+    string sla_message = 9;
+  }
+}
+
+message GetGameInfoRequest {}
+
+message GetGameInfoResponse {
+  google.protobuf.Timestamp start_at = 1;
+  google.protobuf.Timestamp end_at = 2;
+}
+
+message GetPcapsRequest {
+  int32 page_size = 1 [
+    (buf.validate.field).int32.gte = 0,
+    (buf.validate.field).int32.lte = 10
+  ];
+  string page_token = 2;
+}
+
+message GetPcapsResponse {
+  repeated Pcap pcaps = 1;
+  string next_page_token = 2;
+
+  message Pcap {
+    string download_url = 1;
+    google.protobuf.Timestamp capture_started_at = 2;
+    google.protobuf.Timestamp capture_stopped_at = 3;
+  }
+}
+
+message GetScoreboardRequest {
+  int32 page_size = 1 [
+    (buf.validate.field).int32.gte = 0,
+    (buf.validate.field).int32.lte = 10
+  ];
+  string page_token = 2;
+}
+
+message GetScoreboardResponse {
+  repeated Scoreboard scoreboards = 1;
+  string next_page_token = 2;
+
+  message Scoreboard {
+    repeated ScoreboardEntry scoreboard_entries = 1;
+    google.protobuf.Timestamp timestamp = 2;
+
+    message ScoreboardEntry {
+      int64 team_no = 1;
+      string team_name = 2;
+      double total_score = 3;
+      int64 rank = 4;
+      repeated Service services = 5;
+
+      message Service {
+        int64 service_no = 1;
+        string service_name = 2;
+        int64 tick_index = 3;
+        google.protobuf.Timestamp tick_open_at = 4;
+        google.protobuf.Timestamp tick_close_at = 5;
+        repeated Flagstore flagstores = 6;
+        int64 sla_successful_checks = 7;
+        int64 sla_total_checks = 8;
+        SLAStatus sla_status = 9;
+        string commit_hash = 10;
+        double score = 11;
+        double tick_score = 12;
+
+        message Flagstore {
+          int64 flag_no = 1;
+          int64 stolen_flags = 2;
+          int64 total_stolen_flags = 3;
+          int64 lost_flags = 4;
+          int64 total_lost_flags = 5;
+        }
+      }
+    }
+  }
+}
+
+message GetServicesRequest {}
+
+message GetServicesResponse {
+  repeated Service services = 1;
+
+  message Service {
+    int64 no = 1;
+    string name = 2;
+    string description = 3;
+    repeated string categories = 4;
+    int64 flagstore_num = 5;
+    int64 tick_interval_seconds = 6;
+    string address = 7;
+    repeated int64 ports = 8;
+    string repository_url = 9;
+    google.protobuf.Timestamp start_at = 10;
+    google.protobuf.Timestamp end_at = 11;
+  }
+}
+
+message GetTeamInfoRequest {}
+
+message GetTeamInfoResponse {
+  int64 no = 1;
+  string name = 2;
+}
+
+message GetTeamsRequest {}
+
+message GetTeamsResponse {
+  repeated Team teams = 1;
+
+  message Team {
+    int64 no = 1;
+    string name = 2;
+  }
+}
+
+message GenerateWireguardConfigRequest {}
+
+message GenerateWireguardConfigResponse {
+  string filename = 1;
+  string config = 2;
+}
+
+message GetWireguardConfigsRequest {}
+
+message GetWireguardConfigsResponse {
+  repeated Config configs = 1;
+
+  message Config {
+    string filename = 1;
+    string config = 2;
+  }
+}
+
+message SubmitFlagsRequest {
+  repeated string flags = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 100,
+    (buf.validate.field).repeated.items.string.max_len = 255
+  ];
+}
+
+message SubmitFlagsResponse {
+  repeated SubmitFlagResult submit_flag_results = 1;
+
+  message SubmitFlagResult {
+    bool valid = 1;
+    Status status = 2;
+
+    enum Status {
+      STATUS_UNSPECIFIED = 0;
+      STATUS_ACCEPTED = 1;
+      STATUS_WRONG = 2;
+      STATUS_DUPLICATED = 3;
+      STATUS_EXPIRED = 4;
+      STATUS_OWNFLAG = 5;
+      STATUS_ERROR = 6;
+    }
+  }
+}
+
+service FrontendService {
+  rpc GetBuildHistories(GetBuildHistoriesRequest) returns (GetBuildHistoriesResponse) {}
+  rpc GetDeployments(GetDeploymentsRequest) returns (GetDeploymentsResponse) {}
+  rpc GetSLAHistories(GetSLAHistoriesRequest) returns (GetSLAHistoriesResponse) {}
+  rpc GetGameInfo(GetGameInfoRequest) returns (GetGameInfoResponse) {}
+  rpc GetPcaps(GetPcapsRequest) returns (GetPcapsResponse) {}
+  rpc GetScoreboard(GetScoreboardRequest) returns (GetScoreboardResponse) {}
+  rpc GetServices(GetServicesRequest) returns (GetServicesResponse) {}
+  rpc GetTeamInfo(GetTeamInfoRequest) returns (GetTeamInfoResponse) {}
+  rpc GetTeams(GetTeamsRequest) returns (GetTeamsResponse) {}
+  rpc GenerateWireguardConfig(GenerateWireguardConfigRequest) returns (GenerateWireguardConfigResponse) {}
+  rpc GetWireguardConfigs(GetWireguardConfigsRequest) returns (GetWireguardConfigsResponse) {}
+  rpc SubmitFlags(SubmitFlagsRequest) returns (SubmitFlagsResponse) {}
+}
