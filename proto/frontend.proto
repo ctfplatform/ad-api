@@ -1,3 +1,11 @@
+syntax = "proto3";
+
+package core.v1;
+
+import "buf/validate/validate.proto";
+import "status.proto";
+import "google/protobuf/timestamp.proto";
+
 message GetBuildHistoriesRequest {
   int32 page_size = 1 [
     (buf.validate.field).int32.gte = 0,
@@ -248,4 +256,5 @@ service FrontendService {
   rpc GenerateWireguardConfig(GenerateWireguardConfigRequest) returns (GenerateWireguardConfigResponse) {}
   rpc GetWireguardConfigs(GetWireguardConfigsRequest) returns (GetWireguardConfigsResponse) {}
   rpc SubmitFlags(SubmitFlagsRequest) returns (SubmitFlagsResponse) {}
+
 }
